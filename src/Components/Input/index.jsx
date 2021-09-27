@@ -4,7 +4,6 @@ const Index = ({input, ...props}) => {
   return (
     <TextField
       fullWidth
-      autoFocus
       inputProps={input}
       {...props}
     />
