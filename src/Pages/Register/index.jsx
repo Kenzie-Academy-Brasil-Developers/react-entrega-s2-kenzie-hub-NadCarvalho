@@ -13,6 +13,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useHistory } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
+import { createUserRequest } from '../../Api'
+
 const courseModules = [
   "Primeiro módulo (Introdução ao Frontend)",
   "Segundo módulo (Frontend Avançado)",
@@ -28,8 +30,20 @@ const Index = ({ onRegister }) => {
   };
 
   const registerUser = (data) => {
-    onRegister(data.email);
-    console.log(data);
+    console.log('ON_REGISTER', data);
+    createUserRequest(data).then((response) => {
+      console.log('REGISTER', response);
+      onRegister(response);
+      alert('User created!');
+      goToWelcome();
+    }).catch((error) => {
+      console.error('REGISTER_FAILED', error);
+      let message = 'Failed to create user!'
+      if (error?.response?.data?.message) {
+        message = error?.response?.data?.message;
+      }
+      alert(message);
+    })
   };
 
   const schema = yup.object().shape({
@@ -38,7 +52,7 @@ const Index = ({ onRegister }) => {
     email: yup.string().email("Invalid Email").required("Email required"),
     contact: yup.string().min(3, "Invalid Contact").required("Contact required"),
     bio: yup.string().min(3, "Invalid Bio").required("Bio required"),
-    courseModule: yup.string().required("Course Module required").oneOf(courseModules, "Invalid Course Module"),
+    course_module: yup.string().required("Course Module required").oneOf(courseModules, "Invalid Course Module"),
     password: yup
       .string()
       .required("Password required")
@@ -90,9 +104,9 @@ const Index = ({ onRegister }) => {
           />
           <Select
             label="Course Module"
-            error={Boolean(errors.courseModule)}
-            helperText={errors.courseModule?.message}
-            select={register("courseModule")}
+            error={Boolean(errors.course_module)}
+            helperText={errors.course_module?.message}
+            select={register("course_module")}
             menuProps={{ style : { fontSize: '0.88rem' }}}
             defaultValue={''}
             items={courseModules}

@@ -9,25 +9,38 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(null);
   const history = useHistory();
 
-  const login = (user) => {
+  const login = (user, token = null) => {
+    localStorage.setItem('token', JSON.stringify(token));
     localStorage.setItem('user', JSON.stringify(user));
-    setLoggedIn(user);
-    history.push('/home');
+    if (user && token) {
+      setLoggedIn({ user, token });
+      history.push('/home');
+    }
   };
 
   const logout = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     setLoggedIn(null);
     history.push('/');
   };
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    console.log(storedUser);
-    if (storedUser && storedUser.length > 0 && storedUser !== 'null') {
-      login(JSON.parse(storedUser));
+  const updateUser = (user, token) => {
+    if (user && token) {
+      localStorage.setItem('token', JSON.stringify(token));
+      localStorage.setItem('user', JSON.stringify(user));
+      setLoggedIn({ user, token });
     }
-  });
+  }
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    console.log('STORED_DATA', storedUser, storedToken);
+    if (storedToken && storedToken.length > 0 && storedToken !== 'null' && storedToken !== 'undefined') {
+      login(JSON.parse(storedUser), JSON.parse(storedToken));
+    }
+  }, []);
 
   return (
     <div className="App">
@@ -36,7 +49,7 @@ function App() {
           {loggedIn ? <Redirect to="/home" /> : <Register onRegister={login} />}
         </Route>
         <Route exact path="/home">
-          {!loggedIn ? <Redirect to="/" /> : <Home onLogout={logout} user={loggedIn}/>}
+          {!loggedIn ? <Redirect to="/" /> : <Home onLogout={logout} updateUser={updateUser} loggedData={loggedIn}/>}
         </Route>
         <Route path="*">
           {loggedIn ? <Redirect to="/home" /> : <Welcome onLogin={login}/>}

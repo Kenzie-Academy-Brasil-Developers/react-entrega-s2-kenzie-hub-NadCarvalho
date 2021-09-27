@@ -12,7 +12,7 @@ import MenuBookIcon from "@material-ui/icons/MenuBook";
 import DeleteIcon from "@material-ui/icons/Delete";
 
 const Index = ({ items, onRemove }) => {
-  console.log(items);
+  console.log('SKILL_LIST', items);
   return (
     <Grid container spacing={2}>
       <Typography style={{ margin: "5px 10px" }} variant="h6" component="div">
@@ -21,7 +21,7 @@ const Index = ({ items, onRemove }) => {
       <Grid
         item
         xs={12}
-        md={6}
+        md={12}
         style={{ marginBottom: 20, maxHeight: "40vh", overflowY: "scroll" }}
       >
         <List>

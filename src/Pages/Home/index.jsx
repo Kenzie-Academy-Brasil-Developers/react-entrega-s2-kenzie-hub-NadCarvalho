@@ -8,12 +8,13 @@ import Select from "../../Components/Select";
 import List from "../../Components/List";
 
 import * as yup from "yup";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { styled } from "@material-ui/styles";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 
 import { blueGrey } from "@material-ui/core/colors";
+import { addTechUserRequest, getUserInfoRequest, removeTechUserRequest } from "../../Api";
 
 const levelList = ["Iniciante", "Intermediário", "Avançado"];
 
@@ -23,19 +24,9 @@ const Username = styled("span")({
   wordBreak: "break-word",
 });
 
-const Home = ({ user, onLogout }) => {
-  const [techList, setTechList] = useState([
-    {
-      id: "55126701-18ac-40df-aab9-3a88657db446",
-      title: "React",
-      status: "Avançado",
-    },
-    {
-      id: "af06a853-c1fb-4a94-960d-1c6caa8d2b5c",
-      title: "Typescript",
-      status: "Avançado",
-    }
-  ],);
+const Home = ({ loggedData, updateUser, onLogout }) => {
+  const { user, token } = loggedData;
+  const [techList, setTechList] = useState([]);
 
   const schema = yup.object().shape({
     title: yup.string().min(3, "Invalid Tech").required("Tech required"),
@@ -46,13 +37,34 @@ const Home = ({ user, onLogout }) => {
   });
 
   const addTech = (data) => {
-    console.log(data);
-    setTechList([...techList, {id: Date.now(), ...data}])
+    console.log('TECH_FORM', data);
+    addTechUserRequest(data, token).then((response) => {
+      console.log('TECH_ADD', response);
+      setTechList([...techList, response.data])
+    }).catch(error => {
+      console.error('TECH_ADD_FAILED', error);
+      let message = 'Failed to add tech to user!'
+      if (error?.response?.data?.message) {
+        message = error?.response?.data?.message;
+      }
+      alert(message);
+    })
   };
 
   const removeTech = (item) => {
-    const filtered = techList.filter(t => t.id !== item);
-    setTechList([...filtered])
+    console.log('TECH_ID', item);
+    removeTechUserRequest(item, token).then((response) => {
+      console.log('TECH_DEL', response);
+      const filtered = techList.filter(t => t.id !== item);
+      setTechList([...filtered])
+    }).catch(error => {
+      console.error('TECH_DEL_FAILED', error);
+      let message = 'Failed to remove tech from user!'
+      if (error?.response?.data?.message) {
+        message = error?.response?.data?.message;
+      }
+      alert(message);
+    })
   }
 
   const {
@@ -61,11 +73,26 @@ const Home = ({ user, onLogout }) => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
+  useEffect(() => {
+    getUserInfoRequest(user.id).then(response => {
+      console.log('USERINFO', response);
+      updateUser(response.data);
+      setTechList(response.data.techs);
+    }).catch(error => {
+      console.error('USERINFO_FAILED', error);
+      let message = 'Failed to retrieve user!'
+      if (error?.response?.data?.message) {
+        message = error?.response?.data?.message;
+      }
+      alert(message);
+    })
+  }, [])
+
   return (
     <Container>
       <Card>
         <Typography variant="subtitle2">
-          Welcome, <Username>{user}</Username>
+          Welcome, <Username>{user.name}</Username>
           <Button onClick={onLogout} variant="outlined" size="small">
             Logout
           </Button>

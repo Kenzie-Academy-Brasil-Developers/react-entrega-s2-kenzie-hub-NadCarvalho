@@ -12,6 +12,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useHistory } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
+import { loginUserRequest } from '../../Api'
+
 const Welcome = ({onLogin}) => {
   let history = useHistory();
 
@@ -20,8 +22,19 @@ const Welcome = ({onLogin}) => {
   };
 
   const logUser = (data) => {
-    onLogin(data.email);
-    console.log(data);
+    console.log('ON_LOGIN', data);
+    loginUserRequest(data).then((response) => {
+      console.log('LOGIN', response);
+      const { user, token } = response.data;
+      onLogin(user, token);
+    }).catch((error) => {
+      console.error('LOGIN_FAILED', error);
+      let message = 'Failed to log user!'
+      if (error?.response?.data?.message) {
+        message = error?.response?.data?.message;
+      }
+      alert(message);
+    });
   };
 
   const schema = yup.object().shape({
