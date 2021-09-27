@@ -17,7 +17,8 @@ function App() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    console.log(storedUser);
+    if (storedUser && storedUser.length > 0 && storedUser !== 'null') {
       login(JSON.parse(storedUser));
     }
   });
