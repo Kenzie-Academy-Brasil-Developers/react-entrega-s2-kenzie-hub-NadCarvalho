@@ -6,7 +6,6 @@ const MyCard = styled(Card)({
   width: "100%",
   maxWidth: "85vw",
   minHeight: "20vh",
-  maxHeight: "80vh",
   backgroundColor: blueGrey["50"],
   padding: "32px 8px",
 });

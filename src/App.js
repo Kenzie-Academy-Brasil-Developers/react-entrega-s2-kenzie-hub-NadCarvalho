@@ -15,6 +15,12 @@ function App() {
     history.push('/home');
   };
 
+  const logout = () => {
+    localStorage.removeItem('user');
+    setLoggedIn(null);
+    history.push('/');
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     console.log(storedUser);
@@ -30,7 +36,7 @@ function App() {
           {loggedIn ? <Redirect to="/home" /> : <Register onRegister={login} />}
         </Route>
         <Route exact path="/home">
-          {!loggedIn ? <Redirect to="/" /> : <Home/>}
+          {!loggedIn ? <Redirect to="/" /> : <Home onLogout={logout} user={loggedIn}/>}
         </Route>
         <Route path="*">
           {loggedIn ? <Redirect to="/home" /> : <Welcome onLogin={login}/>}
