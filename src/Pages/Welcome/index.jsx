@@ -41,7 +41,7 @@ const Welcome = ({onLogin}) => {
   return (
     <Container>
       <Card>
-        <Typography variant="subtitle1">Welcome</Typography>
+        <Typography variant="subtitle1">Login to access KenzieHub</Typography>
         <Box component="form" sx={{ mt: 1 }} onSubmit={handleSubmit(logUser)}>
           <Input
             label="Email"
